@@ -1,0 +1,537 @@
+<!DOCTYPE html><html lang="en-us"><head>
+<title>TRX TRACKERZ</title>
+<link rel="stylesheet" href="css/reset.css">
+<link rel="stylesheet" href="css/progressbar.css">
+<link rel="stylesheet" href="css/tronhelper.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="root">
+
+	<table id="app">
+		<tbody><tr>
+			<td>Contract Name</td>
+			<td>ROI</td>
+			<td>Contract Balance</td>
+			<td>Est. Done</td>
+			<td>Action</td>
+		</tr>
+		<tr id="row0"></tr>
+		<tr id="row1"></tr>
+		<tr id="row2"></tr>
+		<tr id="row3"></tr>
+		<tr id="row4"></tr>
+		<tr id="row5"></tr>
+		<tr id="row6"></tr>
+		<tr id="row7"></tr>
+		<tr id="row8"></tr>
+		<tr id="row9"></tr>
+		<tr id="row10"></tr>
+		<tr id="row11"></tr>
+		<tr id="row12"></tr>
+		<tr id="row13"></tr>
+		<tr id="row14"></tr>
+		<tr id="row15"></tr>
+		<tr id="row16"></tr>
+		<tr id="row17"></tr>
+		<tr id="row18"></tr>
+		<tr id="row19"></tr>
+		<tr id="row20"></tr>
+	</tbody></table>
+	
+	<table>
+		<tbody><tr>
+			<td>Total Trx:</td>
+			<td id="TotalROI"></td>
+			<td id="TotalBAL"></td>
+		</tr>
+		<tr>
+			<td>PHP Value</td>
+			<td id="TotalPHPROI"></td>
+			<td id="TotalPHP"></td>
+		</tr>
+	</tbody></table>
+    
+
+</div>
+<div id="stat">Status: <span id="stat_text">Loading...</span></div>
+<div id="acct">
+    <div id="acct_addr"> --- </div>
+    <progress max="1" value="0" id="energyBar"></progress>
+    <div id="acct_energy">0/0</div>
+    <a href="https://tronenergy.market/" target="_blank" class="button">buy nrg</a>
+</div>
+<div id="tokenPrice">
+    ...<br>...
+</div>
+<script src="js/cryptoCurrencyWidget%400.0.9.min.js"></script>
+<div id="ticker" class="binance-widget-marquee" data-cmc-ids="1958" data-theme="dark" data-transparent="false" data-locale="en" data-powered-by=" " data-disclaimer=" ">
+</div>
+<div id="ticker2" class="binance-widget-marquee" data-cmc-ids="1839" data-theme="dark" data-transparent="false" data-locale="en" data-powered-by=" " data-disclaimer=" ">
+</div>
+<div id="consoler" style="padding: 80px; background: #000c; color: #fff; display: none"></div>
+<div id="depositer">
+    <div>
+        <button id="d_closer">✕</button>
+        <div id="d_instructions">Open the contract and enter 100 trx for deposit value;</div>
+        <div id="d_energy">
+            Energy Consumption: 🗲<span id="d_nrg">0</span>,000
+            <br>
+            <a href="https://tronenergy.market/" target="_blank" class="button">buy energy</a>
+        </div>
+        <br>
+        <br>
+        <div id="d_action">
+            <a href="#">Open Contract in TronScan</a>
+        </div>
+    </div>
+</div>
+<script src="js/ethers.js" type="application/javascript"></script>
+<script type="text/javascript" src="js/tronweb.js"></script>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/countdown.js"></script>
+<script type="text/javascript">
+
+
+var contracts = [
+	
+	"TYUC54mxLpP5FZ8GdMtY8aFSZo6AkBiJoU", // trontower
+    "TV8KXNpytRNUMT52MuzBTBS7zHWp5K4sqH", // supernode
+    "TKnm6H14HxYA6jv93RMYoFp3oddmw4ZypQ", // eBank
+    "TZAJXbqGESMKgL8CCZtckUXBbHAqDLE1qZ", // tronTriple
+    "TVeq94Vu8S3pJ73Gc8behyzXaHDHiuExuN", //RF
+    "TTcaoLQC17FMwxq5NGPni4td5PfPrpEQrS", // bancoTron
+    "TF9MQv8CEZsUW9WoNocQTMrrKuUsdJrkbb", // tronJet
+    "TEz7scwxJA9QwiqAmqfwaahCeg29XUV2e6", // tronkeeper
+    "TGQbW9rT3RG2PHzMYdV2wxjtAiviB6bU85", // trueTron
+];
+
+
+var abi = [
+	[{"constant":true,"inputs":[],"name":"contractInfo","outputs":[{"name":"_invested","type":"uint256"},{"name":"_withdrawn","type":"uint256"},{"name":"_direct_bonus","type":"uint256"},{"name":"_match_bonus","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"userInfo","outputs":[{"name":"for_withdraw","type":"uint256"},{"name":"total_invested","type":"uint256"},{"name":"total_withdrawn","type":"uint256"},{"name":"total_match_bonus","type":"uint256"},{"name":"structure","type":"uint256[3]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"direct_bonus","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"payoutOf","outputs":[{"name":"value","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"tarifs","outputs":[{"name":"life_days","type":"uint16"},{"name":"percent","type":"uint16"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_tarif","type":"uint8"},{"name":"_upline","type":"address"}],"name":"deposit","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"ref_bonuses","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"match_bonus","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"withdrawn","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"invested","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"players","outputs":[{"name":"upline","type":"address"},{"name":"dividends","type":"uint256"},{"name":"direct_bonus","type":"uint256"},{"name":"match_bonus","type":"uint256"},{"name":"last_payout","type":"uint40"},{"name":"total_invested","type":"uint256"},{"name":"total_withdrawn","type":"uint256"},{"name":"total_match_bonus","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":true,"name":"upline","type":"address"},{"indexed":false,"name":"bonus","type":"uint256"}],"name":"Upline","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":false,"name":"amount","type":"uint256"},{"indexed":false,"name":"tarif","type":"uint8"}],"name":"NewDeposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":true,"name":"from","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"MatchPayout","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"Withdraw","type":"event"}],
+	[{"outputs":[{"name":"_invested","type":"uint256"},{"name":"_withdrawn","type":"uint256"},{"name":"_direct_bonus","type":"uint256"},{"name":"_match_bonus","type":"uint256"}],"constant":true,"name":"contractInfo","stateMutability":"View","type":"Function"},{"outputs":[{"name":"for_withdraw","type":"uint256"},{"name":"withdrawable_bonus","type":"uint256"},{"name":"total_invested","type":"uint256"},{"name":"total_withdrawn","type":"uint256"},{"name":"total_match_bonus","type":"uint256"},{"name":"structure","type":"uint256[3]"}],"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"userInfo","stateMutability":"View","type":"Function"},{"outputs":[{"name":"withdrawable","type":"uint256[]"}],"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"seperatePayoutOf","stateMutability":"View","type":"Function"},{"payable":true,"name":"withdraw","stateMutability":"Payable","type":"Function"},{"outputs":[{"name":"ids","type":"uint8[]"},{"name":"endTimes","type":"uint256[]"},{"name":"amounts","type":"uint256[]"},{"name":"totalWithdraws","type":"uint256[]"}],"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"investmentsInfo","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"direct_bonus","stateMutability":"View","type":"Function"},{"outputs":[{"name":"value","type":"uint256"}],"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"payoutOf","stateMutability":"View","type":"Function"},{"inputs":[{"name":"_addr","type":"address"}],"name":"removeWhitelist","stateMutability":"Nonpayable","type":"Function"},{"inputs":[{"name":"_addr","type":"address"}],"name":"setWhitelist","stateMutability":"Nonpayable","type":"Function"},{"outputs":[{"type":"address"}],"constant":true,"name":"owner","stateMutability":"View","type":"Function"},{"outputs":[{"name":"life_days","type":"uint256"},{"name":"percent","type":"uint256"}],"constant":true,"inputs":[{"type":"uint256"}],"name":"tarifs","stateMutability":"View","type":"Function"},{"payable":true,"inputs":[{"name":"_tarif","type":"uint8"},{"name":"_upline","type":"address"}],"name":"deposit","stateMutability":"Payable","type":"Function"},{"inputs":[{"name":"newFee","type":"uint256"}],"name":"setWithdrawFee","stateMutability":"Nonpayable","type":"Function"},{"outputs":[{"type":"uint8"}],"constant":true,"inputs":[{"type":"uint256"}],"name":"ref_bonuses","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"releaseTime","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"match_bonus","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"withdrawn","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"invested","stateMutability":"View","type":"Function"},{"outputs":[{"type":"address"}],"constant":true,"name":"stakingAddress","stateMutability":"View","type":"Function"},{"outputs":[{"name":"upline","type":"address"},{"name":"dividends","type":"uint256"},{"name":"direct_bonus","type":"uint256"},{"name":"match_bonus","type":"uint256"},{"name":"last_payout","type":"uint256"},{"name":"total_invested","type":"uint256"},{"name":"total_withdrawn","type":"uint256"},{"name":"total_match_bonus","type":"uint256"}],"constant":true,"inputs":[{"type":"address"}],"name":"players","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"withdrawFee","stateMutability":"View","type":"Function"},{"outputs":[{"type":"bool"}],"constant":true,"inputs":[{"type":"address"}],"name":"whiteListed","stateMutability":"View","type":"Function"},{"inputs":[{"name":"_stakingAddress","type":"address"}],"stateMutability":"Nonpayable","type":"Constructor"},{"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":true,"name":"upline","type":"address"},{"name":"bonus","type":"uint256"}],"name":"Upline","type":"Event"},{"inputs":[{"indexed":true,"name":"addr","type":"address"},{"name":"amount","type":"uint256"},{"name":"tarif","type":"uint8"}],"name":"NewDeposit","type":"Event"},{"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":true,"name":"from","type":"address"},{"name":"amount","type":"uint256"}],"name":"MatchPayout","type":"Event"},{"inputs":[{"indexed":true,"name":"addr","type":"address"},{"name":"amount","type":"uint256"}],"name":"Withdraw","type":"Event"}],
+	[{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"refRewards","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"support","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalInvestors","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"withdrawable","outputs":[{"name":"amount","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalInvested","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"tarif","type":"uint256"},{"name":"referer","type":"address"}],"name":"deposit","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"investors","outputs":[{"name":"registered","type":"bool"},{"name":"referer","type":"address"},{"name":"referrals_tier1","type":"uint256"},{"name":"referrals_tier2","type":"uint256"},{"name":"referrals_tier3","type":"uint256"},{"name":"balanceRef","type":"uint256"},{"name":"totalRef","type":"uint256"},{"name":"invested","type":"uint256"},{"name":"paidAt","type":"uint256"},{"name":"withdrawn","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"tarifs","outputs":[{"name":"life_days","type":"uint256"},{"name":"percent","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"allInvestments","outputs":[{"name":"ids","type":"uint256[]"},{"name":"endTimes","type":"uint256[]"},{"name":"amounts","type":"uint256[]"},{"name":"totalWithdraws","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalRefRewards","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"user","type":"address"},{"indexed":false,"name":"tarif","type":"uint256"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"DepositAt","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"user","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"Withdraw","type":"event"}],
+    [{"constant":true,"inputs":[],"name":"contractInfo","outputs":[{"name":"_total_invested","type":"uint256"},{"name":"_total_investors","type":"uint256"},{"name":"_total_withdrawn","type":"uint256"},{"name":"_total_referral_bonus","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"userInfo","outputs":[{"name":"for_withdraw","type":"uint256"},{"name":"withdrawable_referral_bonus","type":"uint256"},{"name":"invested","type":"uint256"},{"name":"withdrawn","type":"uint256"},{"name":"referral_bonus","type":"uint256"},{"name":"referrals","type":"uint256[8]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"soft_release","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"total_withdrawn","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"investment_perc","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"total_invested","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"investmentsInfo","outputs":[{"name":"endTimes","type":"uint256[]"},{"name":"amounts","type":"uint256[]"},{"name":"totalWithdraws","type":"uint256[]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"payoutOf","outputs":[{"name":"value","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"total_referral_bonus","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"investment_days","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"full_release","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"total_investors","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"referral_bonuses","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"players","outputs":[{"name":"referral","type":"address"},{"name":"dividends","type":"uint256"},{"name":"referral_bonus","type":"uint256"},{"name":"last_payout","type":"uint256"},{"name":"total_invested","type":"uint256"},{"name":"total_withdrawn","type":"uint256"},{"name":"total_referral_bonus","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_referral","type":"address"}],"name":"deposit","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"Deposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"Withdraw","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"Reinvest","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":false,"name":"amount","type":"uint256"},{"indexed":false,"name":"level","type":"uint8"}],"name":"ReferralPayout","type":"event"}],
+    [{"constant":true,"inputs":[],"name":"PERCENTS_DIVIDER","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"referrer","type":"address"}],"name":"invest","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserDividends","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserAvailable","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getTotalDeposits","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserPercentRate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"TIME_STEP","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserReferrer","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"projectAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserLevelBonus","outputs":[{"name":"","type":"uint256[3]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"PROJECT_FEE","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalWithdrawn","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalInvested","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getTotalInvested","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"REFERRAL_PERCENTS","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"BASE_PERCENT","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"flag","type":"bool"}],"name":"setStart","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"CONTRACT_BALANCE_STEP","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getContractBalance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalDeposits","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserTotalDeposits","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserWithdrawnBonus","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getTotalWithdrawn","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getTotalUsers","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"isActive","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"marketingAddress","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserAmountOfDeposits","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"MARKETING_FEE","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"start","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalUsers","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"},{"name":"index","type":"uint256"}],"name":"getUserDepositInfo","outputs":[{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getStart","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserCheckpoint","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"INVEST_MIN_AMOUNT","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserReferralBonus","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserTotalWithdrawn","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getContractBalanceRate","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"marketingAddr","type":"address"},{"name":"projectAddr","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"user","type":"address"}],"name":"Newbie","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"user","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"NewDeposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"user","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"Withdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"referrer","type":"address"},{"indexed":true,"name":"referral","type":"address"},{"indexed":true,"name":"level","type":"uint256"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"RefBonus","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"user","type":"address"},{"indexed":false,"name":"totalAmount","type":"uint256"}],"name":"FeePayed","type":"event"}],
+    [{"outputs":[{"type":"uint256"}],"constant":true,"name":"getBalance","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"inputs":[{"type":"address"}],"name":"address2UID","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"REFERENCE_RATE","stateMutability":"View","type":"Function"},{"name":"checkIn","stateMutability":"Nonpayable","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"REFERRER_CODE","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"MARKETING_RATE","stateMutability":"View","type":"Function"},{"outputs":[{"type":"address"}],"constant":true,"name":"getReferenceAccount","stateMutability":"View","type":"Function"},{"payable":true,"name":"withdraw","stateMutability":"Payable","type":"Function"},{"outputs":[{"type":"uint256[]"},{"type":"uint256[]"},{"type":"uint256[]"},{"type":"uint256[]"},{"type":"bool[]"}],"constant":true,"inputs":[{"name":"_uid","type":"uint256"}],"name":"getInvestmentPlanByUID","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"REFERENCE_LEVEL2_RATE","stateMutability":"View","type":"Function"},{"inputs":[{"name":"_newMarketingAccount","type":"address"}],"name":"setMarketingAccount","stateMutability":"Nonpayable","type":"Function"},{"payable":true,"inputs":[{"name":"addr","type":"address"},{"name":"_planId","type":"uint256"}],"name":"grant","stateMutability":"Payable","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"latestReferrerCode","stateMutability":"View","type":"Function"},{"outputs":[{"type":"address"}],"constant":true,"name":"getDeveloperAccount","stateMutability":"View","type":"Function"},{"outputs":[{"type":"address"}],"constant":true,"name":"getMarketingAccount","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"REFERENCE_LEVEL1_RATE","stateMutability":"View","type":"Function"},{"inputs":[{"name":"_newReferenceAccount","type":"address"}],"name":"setReferenceAccount","stateMutability":"Nonpayable","type":"Function"},{"outputs":[{"type":"address"}],"constant":true,"name":"owner","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"MINIMUM","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"REFERENCE_LEVEL3_RATE","stateMutability":"View","type":"Function"},{"outputs":[{"name":"addr","type":"address"},{"name":"referrerEarnings","type":"uint256"},{"name":"availableReferrerEarnings","type":"uint256"},{"name":"referrer","type":"uint256"},{"name":"planCount","type":"uint256"},{"name":"level1RefCount","type":"uint256"},{"name":"level2RefCount","type":"uint256"},{"name":"level3RefCount","type":"uint256"}],"constant":true,"inputs":[{"type":"uint256"}],"name":"uid2Investor","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"REFERENCE_SELF_RATE","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256"},{"type":"uint256[]"},{"type":"uint256[]"}],"constant":true,"inputs":[{"name":"_uid","type":"uint256"}],"name":"getInvestorInfoByUID","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"DEVELOPER_RATE","stateMutability":"View","type":"Function"},{"payable":true,"inputs":[{"name":"_referrerCode","type":"uint256"},{"name":"_planId","type":"uint256"}],"name":"invest","stateMutability":"Payable","type":"Function"},{"outputs":[{"type":"uint256[]"},{"type":"uint256[]"},{"type":"uint256[]"}],"constant":true,"name":"getCurrentPlans","stateMutability":"View","type":"Function"},{"inputs":[{"name":"_newOwner","type":"address"}],"name":"transferOwnership","stateMutability":"Nonpayable","type":"Function"},{"inputs":[{"name":"_newDeveloperAccount","type":"address"}],"name":"setDeveloperAccount","stateMutability":"Nonpayable","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"name":"getTotalInvestments","stateMutability":"View","type":"Function"},{"outputs":[{"type":"uint256"}],"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"getUIDByAddress","stateMutability":"View","type":"Function"},{"stateMutability":"Nonpayable","type":"Constructor"},{"payable":true,"stateMutability":"Payable","type":"Fallback"},{"inputs":[{"name":"investor","type":"address"},{"name":"amount","type":"uint256"}],"name":"onInvest","type":"Event"},{"inputs":[{"name":"grantor","type":"address"},{"name":"beneficiary","type":"address"},{"name":"amount","type":"uint256"}],"name":"onGrant","type":"Event"},{"inputs":[{"name":"investor","type":"address"},{"name":"amount","type":"uint256"}],"name":"onWithdraw","type":"Event"},{"inputs":[{"indexed":true,"name":"previousOwner","type":"address"},{"indexed":true,"name":"newOwner","type":"address"}],"name":"onOwnershipTransferred","type":"Event"}],
+    [{"constant":true,"inputs":[],"name":"contractInfo","outputs":[{"name":"_invested","type":"uint256"},{"name":"_withdrawn","type":"uint256"},{"name":"_direct_bonus","type":"uint256"},{"name":"_match_bonus","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"userInfo","outputs":[{"name":"for_withdraw","type":"uint256"},{"name":"total_invested","type":"uint256"},{"name":"total_withdrawn","type":"uint256"},{"name":"total_match_bonus","type":"uint256"},{"name":"structure","type":"uint256[3]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"direct_bonus","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"payoutOf","outputs":[{"name":"value","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"tarifs","outputs":[{"name":"life_days","type":"uint8"},{"name":"percent","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_tarif","type":"uint8"},{"name":"_upline","type":"address"}],"name":"deposit","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"ref_bonuses","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"match_bonus","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"withdrawn","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"invested","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"players","outputs":[{"name":"upline","type":"address"},{"name":"dividends","type":"uint256"},{"name":"direct_bonus","type":"uint256"},{"name":"match_bonus","type":"uint256"},{"name":"last_payout","type":"uint40"},{"name":"total_invested","type":"uint256"},{"name":"total_withdrawn","type":"uint256"},{"name":"total_match_bonus","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":true,"name":"upline","type":"address"},{"indexed":false,"name":"bonus","type":"uint256"}],"name":"Upline","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":false,"name":"amount","type":"uint256"},{"indexed":false,"name":"tarif","type":"uint8"}],"name":"NewDeposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":true,"name":"from","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"MatchPayout","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"Withdraw","type":"event"}],
+    [{"constant":true,"inputs":[],"name":"contractInfo","outputs":[{"name":"_invested","type":"uint256"},{"name":"_withdrawn","type":"uint256"},{"name":"_direct_bonus","type":"uint256"},{"name":"_match_bonus","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"userInfo","outputs":[{"name":"for_withdraw","type":"uint256"},{"name":"total_invested","type":"uint256"},{"name":"total_withdrawn","type":"uint256"},{"name":"total_match_bonus","type":"uint256"},{"name":"structure","type":"uint256[3]"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"direct_bonus","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"payoutOf","outputs":[{"name":"value","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"refupline","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"tarifs","outputs":[{"name":"life_days","type":"uint256"},{"name":"percent","type":"uint256"},{"name":"min_inv","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"per","type":"uint256"}],"name":"addReferupline","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_tarif","type":"uint8"},{"name":"_upline","type":"address"}],"name":"deposit","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"ref_bonuses","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"match_bonus","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"withdrawn","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"invested","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"players","outputs":[{"name":"upline","type":"address"},{"name":"dividends","type":"uint256"},{"name":"direct_bonus","type":"uint256"},{"name":"match_bonus","type":"uint256"},{"name":"last_payout","type":"uint40"},{"name":"total_invested","type":"uint256"},{"name":"total_withdrawn","type":"uint256"},{"name":"total_match_bonus","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":true,"name":"upline","type":"address"},{"indexed":false,"name":"bonus","type":"uint256"}],"name":"Upline","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":false,"name":"amount","type":"uint256"},{"indexed":false,"name":"tarif","type":"uint8"}],"name":"NewDeposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":true,"name":"from","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"MatchPayout","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"addr","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"Withdraw","type":"event"}],
+    [{"constant":true,"inputs":[],"name":"PERCENTS_DIVIDER","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserDownlineCount","outputs":[{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"referrer","type":"address"}],"name":"invest","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserDividends","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserAvailable","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"TIME_STEP","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserReferrer","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"creator1","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalWithdrawn","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalInvested","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"REFERRAL_PERCENTS","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"BASE_PERCENT","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getContractBalance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalDeposits","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserTotalDeposits","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"isActive","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"users","outputs":[{"name":"checkpoint","type":"uint256"},{"name":"referrer","type":"address"},{"name":"bonus","type":"uint256"},{"name":"level1","type":"uint256"},{"name":"level2","type":"uint256"},{"name":"level3","type":"uint256"},{"name":"TotalRefferers","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserAmountOfDeposits","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalUsers","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"},{"name":"index","type":"uint256"}],"name":"getUserDepositInfo","outputs":[{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserCheckpoint","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"INVEST_MIN_AMOUNT","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserReferralBonus","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"userAddress","type":"address"}],"name":"getUserTotalWithdrawn","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_owner","type":"address"},{"name":"_creator1","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"user","type":"address"}],"name":"Newbie","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"user","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"NewDeposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"user","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"Withdrawn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"referrer","type":"address"},{"indexed":true,"name":"referral","type":"address"},{"indexed":true,"name":"level","type":"uint256"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"RefBonus","type":"event"}],
+    
+];
+
+var tmpVars = [];
+var fnz = [];
+var inz = [];
+
+for(let xx = 0; xx < contracts.length; xx++) {
+    tmpVars[xx] = [0,0,0,0,0];
+    fnz[xx] = function() {};
+    inz[xx] = function() {};
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+const tronAccount = "TAxm2tkFTMR11F3v3xz8gqWPvdbDgTkNyC";
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+var PHP = 9.5;
+var BNB = 30200;
+
+var totalRoi = 0;
+var totalBal = 0;
+
+var estimate = function(v, r, b, daily=0) {
+	if(r == 0) return " --- ";
+	if(daily != 0) {
+		var rem = b - r;
+		var perSecond = daily * 1e6 / 86400;
+		var remaining = rem / perSecond;
+		return countdown(new Date().getTime() + (remaining * 1e3));
+	
+	}
+	if(tmpVars[v][0] == 0) {
+		tmpVars[v][0] = tmpVars[v][2];
+	}
+	if(tmpVars[v][1] == 0) {
+		tmpVars[v][1] = tmpVars[v][3];
+	}
+	tmpVars[v][2] = parseInt(r);
+	tmpVars[v][3] = new Date().getTime()/1e3;
+	var lapsed = tmpVars[v][3] - tmpVars[v][1];
+	var diff = tmpVars[v][2] - tmpVars[v][0];
+	var perSecond = diff / lapsed;
+	if(tmpVars[v][4] == 0) {
+		tmpVars[v][4] = perSecond;
+	}
+	perSecond = (tmpVars[v][4] + perSecond) / 2;
+	tmpVars[v][4] = perSecond;
+	var remaining = (b - r) / perSecond;
+	return countdown(new Date().getTime() + (remaining * 1e3));
+}
+
+var toPHP = function(amt) {
+    return (Math.floor(100 * amt * PHP)/100000000).toFixed(2) + ' PHP';
+};
+
+var openDepositer = function(nrg, txt, addr) {
+    $("#d_nrg").html(nrg);
+    $("#d_instructions").html(txt);
+    $("#d_action").html("<a href=\"https://tronscan.org/#/contract/" + addr + "\" target=\"_blank\">Open Contract in TronScan</a>");
+    $("#depositer").addClass("open");
+};
+
+var updateRow = function(i, name, amt, bal, egy, tg, daily=0) {
+    _loaded++;
+    if(_loaded + 1 >= _totalLoad) {
+        $("#stat_text").html("Contracts refreshed");
+    } else {
+        $("#stat_text").html("Refreshing " + _loaded + "/" + _totalLoad);
+    }
+	$("#row" + i).html('<td><a target="_blank" href="https://tronscan.org/#/contract/' + contracts[i] + '">' + name + '<span style="float: right">[' + toPHP(amt) + ']</span></a></td><td>' + parseFloat(parseAmount(amt)).toFixed(4) + ' TRX / ' + parseFloat(parseAmount(tg)).toFixed(4) + ' TRX<br><progress max="' + Math.floor(parseAmount(tg)) + '" value="' + Math.floor(parseAmount(amt)) + '" style="--value: ' + Math.floor(parseAmount(amt)) + ';--max: ' + Math.floor(parseAmount(tg)) + '"></progress></td><td>' + parseFloat(parseAmount(bal)).toFixed(2) + ' TRX | '+Math.round(parseAmount(bal) * PHP)+' PHP</td><td>' + estimate(i, amt, tg, daily) + '</td><td><button onclick="fnz[' + i + ']()">Withdraw</button> 🗲 ' + egy + ' | <button class="depo" onclick="inz[' + i + ']()">Deposit</button></td>');
+    $("#row" + i).removeClass("updating");
+    
+    
+    $("#heartbeat").removeClass("disconnected").addClass("connected").html("connected");
+    clearTimeout(chid);
+    chid = setTimeout(function() {
+        $("#heartbeat").removeClass("connected").addClass("disconnected").html("disconnected");
+    }, 3000);
+}
+
+var _loaded = 0;
+var _totalLoad = 0;
+
+$("#d_closer").click(() => {
+    $("#depositer").removeClass("open");
+});
+
+var handlers = [
+    
+    async (contract, balance) => {
+        totalBal += balance;
+        var roi = await contract.payoutOf(tronAccount).call({from:tronAccount});
+        totalRoi += parseInt(roi);
+        fnz[0] = () => {
+            contract.withdraw().send();
+        };
+        inz[0] = () => {
+            openDepositer("161", "Deposit: 975 TRX<br>TARIF: 8<br>UPLINE: " + tronAccount + "<hr>DAILY: 6.1%<br>DURATION: 30 DAYS<br>RISK: NONE", contract.address);
+        };
+        var energy = await estimateEnergy(...[,],contract.address,"withdraw()");
+        energy = parseInt(Math.ceil(energy/1000)) + "K";
+        updateRow(0, "TronTower (checked)", roi, balance, energy, balance);
+    },
+    
+    
+    
+    async (contract, balance) => {
+        totalBal += balance;
+        var roi = await contract.payoutOf(tronAccount).call({from:tronAccount});
+        totalRoi += parseInt(roi);
+        fnz[1] = () => {
+            contract.withdraw().send();
+        };
+        inz[1] = () => {
+            openDepositer("236", "Deposit: 430 TRX<br>TARIF: 1<br>UPLINE: " + tronAccount + "<hr>DAILY: 5.5%<br>DURATION: 46 DAYS<br>RISK: LOW", contract.address);
+        };
+        var energy = await estimateEnergy(...[,],contract.address,"withdraw()");
+        energy = parseInt(Math.ceil(energy/1000)) + "K";
+        updateRow(1, "TronSuper (checked)", roi, balance, energy, balance);
+    },
+    
+    
+    async (contract, balance) => {
+        totalBal += balance;
+        var roi = await contract.withdrawable().call({from:tronAccount});
+        totalRoi += parseInt(roi);
+        fnz[2] = () => {
+            contract.withdraw().send();
+        };
+        inz[2] = () => {
+            openDepositer("146", "Deposit: 1,085 TRX<br>TARIF: 2<br>REFER: TS1BQBLjyKvJK5Anr1ADrBAomhjEdSdBi9<hr>DAILY: 4.5%<br>DURATION: 34 DAYS<br>RISK: NONE", contract.address);
+        };
+        var energy = await estimateEnergy(...[,],contract.address,"withdraw()");
+        energy = parseInt(Math.ceil(energy/1000)) + "K";
+        updateRow(2, "eBank (checked)", roi, balance, energy, balance);
+    },
+    
+    
+    async (contract, balance) => {
+        totalBal += balance;
+        var roi = await contract.payoutOf(tronAccount).call({from:tronAccount});
+        totalRoi += parseInt(roi);
+        fnz[3] = () => {
+            contract.withdraw().send();
+        };
+        inz[3] = () => {
+            openDepositer("309", "Deposit: 300 TRX<br>UPLINE: " + tronAccount + "<hr>DAILY: 3%<br>DURATION: 100 DAYS<br>RISK: NONE", contract.address);
+        };
+        var energy = await estimateEnergy(...[,],contract.address,"withdraw()");
+        energy = parseInt(Math.ceil(energy/1000)) + "K";
+        updateRow(3, "TronTriple (checked)", roi, balance, energy, balance);
+    },
+    
+	async function(contract, balance) {
+        var roi = await contract.getUserAvailable(tronAccount).call({from:tronAccount});
+        var est = await contract.getUserPercentRate(tronAccount).call({from:tronAccount});
+		totalRoi += parseInt(roi);
+		totalBal += balance;
+		fnz[4] = function() {
+			contract.withdraw().send();
+		};
+        inz[4] = () => {
+            openDepositer("185", "Deposit: Atleast 100 TRX<br>REF ADDR: TVtQ6qCsR2yVxf53GostDqH9QR6mYaP4SS<hr>DAILY: 1% + 0.1% DAILY HOLD BONUS<br>DURATION: 40 DAYS NO WITHDRAW<br>RISK: MEDIUM", contract.address);
+        };
+        var energy = await estimateEnergy(...[,],contract.address,"withdraw()");
+        energy = parseInt(Math.ceil(energy/1000)) + "K";
+		updateRow(4, "RF | Current Daily: " + parseInt(est)/10 +"%", roi, balance, energy, balance);
+	},
+    
+    
+    async (contract, balance) => {
+        totalBal += balance;
+        try {
+            var roi = await contract.getInvestorInfoByUID(6671).call({from:tronAccount});
+            roi = roi[8][0];
+            totalRoi += parseInt(parseAmount(roi))*1e6;
+        } catch(e) {
+            var roi = 0;
+        }
+        fnz[5] = () => {
+            contract.withdraw().send();
+        };
+        inz[5] = () => {
+            openDepositer("182", "Deposit: 433 TRX<br>REF CODE: 6671<br>PLAN ID: 1<hr>DAILY: 4.6%<br>DURATION: 45 DAYS<br>RISK: NONE", contract.address);
+        };
+        var energy = await estimateEnergy(...[,],contract.address,"withdraw()");
+        energy = parseInt(Math.ceil(energy/1000)) + "K";
+        updateRow(5, "BancoTron (checked)", roi, balance, energy, balance);
+    },
+    
+    
+    async (contract, balance) => {
+        totalBal += balance;
+        var roi = await contract.payoutOf(tronAccount).call({from:tronAccount});
+        fnz[6] = () => {
+            contract.withdraw().send();
+        };
+        inz[6] = () => {
+            openDepositer("146", "Deposit: 548 TRX<br>UPLINE: " + tronAccount + "<br>TARIF: 0<hr>DAILY: 15%<br>DURATION: 10 DAYS<br>RISK: NONE", contract.address);
+        };
+        var energy = await estimateEnergy(...[,],contract.address,"withdraw()");
+        energy = parseInt(Math.ceil(energy/1000)) + "K";
+        updateRow(6, "TronJet (checked)", roi, balance, energy, balance);
+    },
+    
+    
+    async (contract, balance) => {
+        totalBal += balance;
+        var roi = await contract.payoutOf(tronAccount).call({from:tronAccount});
+        fnz[7] = () => {
+            contract.withdraw().send();
+        };
+        inz[7] = () => {
+            openDepositer("162", "Deposit: 199 TRX<br>UPLINE: " + tronAccount + "<br>TARIF: 0<hr>DAILY: 15%<br>DURATION: 16 DAYS<br>RISK: NONE", contract.address);
+        };
+        var energy = await estimateEnergy(...[,],contract.address,"withdraw()");
+        energy = parseInt(Math.ceil(energy/1000)) + "K";
+        updateRow(7, "TronKeeper (checked)", roi, balance, energy, balance);
+    },
+    
+    
+    async (contract, balance) => {
+        totalBal += balance;
+        var roi = await contract.getUserAvailable(tronAccount).call({from:tronAccount});
+        fnz[8] = () => {
+            contract.withdraw().send();
+        };
+        inz[8] = () => {
+            openDepositer("118", "Deposit: 676 TRX<br>REFERRER: " + tronAccount + "<hr>DAILY: 5%<br>DURATION: 30 DAYS<br>RISK: NONE", contract.address);
+        };
+        var energy = await estimateEnergy(...[,],contract.address,"withdraw()");
+        energy = parseInt(Math.ceil(energy/1000)) + "K";
+        updateRow(8, "TrueTron (checked)", roi, balance, energy, balance);
+    },
+    
+    
+    
+    
+];
+
+
+function parseAmount(amt) {
+	return tronWeb.fromSun(amt);
+}
+
+
+function getTronWeb() {
+	return new Promise((resolve, reject) => {
+		window.tronWeb ? resolve(window.tronWeb) : reject('TronWeb not found');
+	});
+}
+
+var pause = (time) => {
+  return new Promise(res => {
+    setTimeout(res,time)
+  });
+};
+
+var chid = 0;
+
+setTimeout(function() {
+
+
+    $(function() {
+    
+        var updatePrice = function() {
+            $.get("https://api.coingecko.com/api/v3/simple/price?ids=tron,binancecoin&vs_currencies=php", res => {
+                
+                if(typeof(res.tron) != "undefined") {
+                    PHP = res.tron.php;
+                    BNB = res.binancecoin.php;
+                    console.log("Tron Price: " + PHP);
+                    console.log("BNB Price: " + BNB);
+                    $("#tokenPrice").html("TRX/PHP: " + PHP + " PHP<br>BNB/PHP: " + BNB + " PHP");
+                }
+            });
+        
+        };
+    
+        setInterval(updatePrice, 20000);
+        updatePrice();
+    
+    });
+	
+	getTronWeb().then(async tronWeb => {
+    
+        tmp = tronWeb;
+			console.clear();
+		
+		var checkAccount = async function(tronWeb) {
+			console.log("Rfreshing account");
+            //$("#acct_addr").html(tronAccount);
+			try {
+                tronWeb.trx.getAccount(tronAccount).then(res => {
+                    //console.log(res);
+                    $("#acct_addr").html((parseInt(res.balance) / 1e6) + " TRX | " + Math.round(PHP * parseInt(res.balance) / 1e4)/100 + " PHP");
+                });
+				await pause(400);
+                tronWeb.trx.getAccountResources(tronAccount).then(res => {
+                    //console.log(res);
+                    if(typeof(res.EnergyUsed) != 'undefined') {
+                        $("#acct_energy").html("Energy: " + (res.EnergyLimit - res.EnergyUsed) + "/" + res.EnergyLimit);
+                        console.log("Current Energy " + (res.EnergyLimit - res.EnergyUsed));
+                        $("#energyBar").attr("max", res.EnergyLimit);
+                        $("#energyBar").attr("value", res.EnergyLimit - res.EnergyUsed);
+                        $("#energyBar").attr("style", "--max:" + res.EnergyLimit + "; --value: " + (res.EnergyLimit - res.EnergyUsed));
+                    } else {
+                        $("#acct_energy").html("Energy: " + res.EnergyLimit);
+                        console.log("Current Energy " + res.EnergyLimit);
+                        $("#energyBar").attr("max", "100");
+                        $("#energyBar").attr("value", "100");
+                        $("#energyBar").attr("style", "--max: 100; --value: 100");
+                    }
+                });
+			} catch(e) {};
+			setTimeout(checkAccount, 8000, tronWeb);
+		};
+	
+		var checkContracts = async function(tronWeb) {
+			totalRoi = 0;
+			totalBal = 0;
+            _loaded = 0;
+            var firstLoad = _totalLoad == 0 ? true : false;
+			for(var i = 0; i < handlers.length; i++) {
+				if(contracts[i] != "") {
+					try {
+						let _bal = await tronWeb.trx.getBalance(contracts[i]);
+                        $("#row" + i).addClass("updating");
+						await pause(400);
+						await handlers[i](tronWeb.contract(abi[i], contracts[i]), _bal);
+						$("#TotalROI").html(totalRoi/1e6 + " TRX");
+						$("#TotalBAL").html(parseAmount(totalBal) + " TRX");
+						$("#TotalPHP").html((parseAmount(totalBal) * PHP).toFixed(2) + " PHP");
+						$("#TotalPHPROI").html((totalRoi/1e6 * PHP).toFixed(2) + " PHP");
+						if(firstLoad == true)
+							_totalLoad++;
+						if(_loaded >= _totalLoad && !firstLoad) {
+							$("#stat_text").html("Contracts refreshed");
+						} else if(firstLoad == true) {
+							$("#stat_text").html("Loaded " + _loaded + " contracts");
+						} else {
+							$("#stat_text").html("Refreshing " + _loaded + "/" + _totalLoad);
+						}
+					} catch(e) {};
+				}
+			}
+			setTimeout(checkContracts, 400, tronWeb);
+		};
+        
+        $("#stat_text").html("Refreshing " + _loaded + "/" + _totalLoad);
+		
+		
+		checkContracts(tronWeb);
+        checkAccount(tronWeb);
+	});
+	
+}, 2000);
+
+
+var energies = {};
+async function estimateEnergy(from="TAxm2tkFTMR11F3v3xz8gqWPvdbDgTkNyC", contract, fn, params='') {
+    if(energies[contract] == undefined) {
+        energies[contract] = {
+            energy_used: 0,
+            last_updated: new Date().getTime() - 91e3
+        };
+    }
+    if(energies[contract].last_updated + 90e3 < new Date().getTime()) {
+        const options = {
+          method: 'POST',
+          headers: {accept: 'application/json', 'content-type': 'application/json'},
+          body: JSON.stringify({
+            owner_address: from,
+            contract_address: contract,
+            function_selector: fn,
+            parameter: params,
+            visible: true
+          })
+        };
+
+        var res = await fetch('https://api.trongrid.io/wallet/triggerconstantcontract', options);
+        //  .then(response => alert(response.json()))
+        //  .then(response => console.log(response))
+        //  .catch(err => console.error(err));
+        if(res.ok) {
+            var f = await res.json();
+            if(f.energy_used == undefined) {
+                f.energy_used = 0;
+            }
+            energies[contract].energy_used = f.energy_used;
+            return f.energy_used;
+        } else {
+            return 0;
+        }
+    }
+    return energies[contract].energy_used;
+}
+
+
+setTimeout(function() {
+	top.location.href = top.location.href;
+}, 12 * 60 * 60 * 1000); // refresh every hr
+
+</script>
+
+<div id="heartbeat" class="disconnected">disconnected</div>
+
+
+
+</body></html>
